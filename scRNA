@@ -1,12 +1,11 @@
 install.packages('Seurat')
 library(Seurat)
-library(Seurat)
-GBM012 <- Read10X(data.dir = "D:/glioma scRNA/GSE210567/GSM6432739")
+GBM012 <- Read10X(data.dir = "D:/glioma scRNA/GSE202371/GSM6112133")
 GBM012 <- CreateSeuratObject(counts = GBM012, project = "GBM012", min.cells = 3, min.features=200)
 GBM012[["percent.mt"]] <- PercentageFeatureSet(GBM012, pattern = "^MT-")
 head(GBM012@meta.data,5)
 VlnPlot(GBM011, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, pt.size = 0)
-GBM012<- subset(GBM011, subset = nFeature_RNA > 200 & nFeature_RNA < 9000 &nCount_RNA<50000& percent.mt < 25)
+GBM012<- subset(GBM011, subset = nFeature_RNA > 200 & nFeature_RNA < 9000 & percent.mt < 25)
 GBM012 <- NormalizeData(GBM012, normalization.method = "LogNormalize", scale.factor = 10000)
 GBM012 <- FindVariableFeatures(GBM012, selection.method = "vst", nfeatures = 2000)
 top10 <- head(VariableFeatures(GBM012), 10)
@@ -33,8 +32,6 @@ GBM012 <- JoinLayers(object = GBM012, new.name = "RNA")
 GBM012$low <- WhichCells(GBM012, expression = SLC7A5<1)
 GBM012$high <- WhichCells(GBM012, expression = SLC7A5>=1)
 GBM012_DEGs <- FindMarkers(GBM012, ident.1 =GBM012$high, ident.2=GBM012$low,min.pct = 0.25)
-VlnPlot(GBM012, features = c('SLC7A5'), 
-        idents = c("TAMs", "Tumor cells"), pt.size = 0, combine = TRUE)
 DotPlot(GBM012, features = c("C1QA","CD14","HLA-DRA","CD74",
                              "PTPRZ1","SOX2","SOX4","PDGFRA",
                              "CD3D","CD3E","CD3G",
@@ -43,3 +40,5 @@ FeaturePlot(GBM012,features = c("SLC7A5"),cols = c("lightgrey","red"),reduction 
 new.cluster.ids <- c("TAMs","Tumor cells","Tumor cells","Other","Tumor cells","TAMs","T cells","Other","Tumor cells","Endothelial cells","Other","Tumor cells","TAMs","Other")
 names(new.cluster.ids) <- levels(GBM012)
 GBM012 <- RenameIdents(GBM012, new.cluster.ids)
+VlnPlot(GBM012, features = c('SLC7A5'), 
+        idents = c("Macrophages", "Tumor cells"), pt.size = 0, combine = TRUE)
